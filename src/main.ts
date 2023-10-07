@@ -29,13 +29,16 @@ declare global {
   }
 }
 
+const spawnerName = 'noobspitter';
+const creepName = 'fred';
+
 // this functions spawns a creep
 function spawnFred(variant: string) {
-  const nameOfFred = `fred-${variant}`;
-  const willFredLive = Game.spawns['noobspitter'].spawnCreep([WORK, CARRY, MOVE], nameOfFred, { dryRun: true });
+  const nameOfFred = `${creepName}-${variant}`;
+  const willFredLive = Game.spawns[spawnerName].spawnCreep([WORK, CARRY, MOVE], nameOfFred, { dryRun: true });
 
   if(willFredLive === OK) {
-    Game.spawns['noobspitter'].spawnCreep([WORK, CARRY, MOVE], nameOfFred);
+    Game.spawns[spawnerName].spawnCreep([WORK, CARRY, MOVE], nameOfFred);
   }
 }
 
