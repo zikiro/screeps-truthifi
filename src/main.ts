@@ -29,6 +29,29 @@ declare global {
   }
 }
 
+// this functions spawns a creep
+function spawnFred(variant: string) {
+  const nameOfFred = `fred-${variant}`;
+  const willFredLive = Game.spawns['noobspitter'].spawnCreep([WORK, CARRY, MOVE], nameOfFred, { dryRun: true });
+
+  if(willFredLive === OK) {
+    Game.spawns['noobspitter'].spawnCreep([WORK, CARRY, MOVE], nameOfFred);
+  }
+}
+
+// this function makes a creep collect energy
+function collectEnergy(creep: Creep) {
+  const sources = creep.room.find(FIND_SOURCES);
+  if(creep.harvest(sources[1]) === ERR_NOT_IN_RANGE) {
+    creep.moveTo(sources[1]);
+  }
+  creep.harvest(sources[1]);
+}
+
+function checkEnergyFull(creep: Creep) {
+  return creep.store.getFreeCapacity() <= 0;
+}
+
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
 export const loop = ErrorMapper.wrapLoop(() => {
@@ -40,4 +63,24 @@ export const loop = ErrorMapper.wrapLoop(() => {
       delete Memory.creeps[name];
     }
   }
+  spawnFred(Game.time.toString());
+
+  for(const name in Game.creeps) {
+
+    const fred = Game.creeps[name];
+    const room = fred.room;
+    const controller = fred.room.controller;
+
+    if (fred && !checkEnergyFull(fred)) {
+      fred.say('hungry', true);
+      collectEnergy(fred);
+      return;
+    }
+
+    if (fred && checkEnergyFull(fred) && room && controller) {
+      fred.moveTo(controller.pos);
+      fred.transfer(controller, RESOURCE_ENERGY);
+    }
+  }
+
 });
